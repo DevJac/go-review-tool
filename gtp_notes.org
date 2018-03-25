@@ -1,0 +1,93 @@
+* Go Text Protocol, version 2
+** Protocol Basics
+*** Communication Model
+All communication is initiated by the controller in the form of commands, to which the engine responds.
+*** Character Set
+All commands are composed of ASCII characters.
+*** Command / Response structure
+Commands take the form: ~[id] command_name [arguments]~
+Responses take the form: ~=[id] result~ and is terminated with 2 newline characters.
+Errors take the form: ~?[id] error_message~
+*** Timing
+Commands and responses may be sent at any time. The engine must respond to commands in the same order they are received.
+*** Board Coordinates
+Coordinates are given with a letter and a number. ~A1~ is the lower-left corner, ~T1~ is the lower-right corner. The letter "I" is not used in coordinates.
+
+Letters go horizontally from left to right.
+
+Number go vertically from bottom to top.
+
+Boards larger than 25 x 25 are not supported.
+*** Types / Entities
+**** Simple Types / Entities
+***** int
+***** float
+***** string
+***** vertex
+Examples: ~B13~, ~j11~
+***** color
+Case insensitive; one of: ~w~, ~b~, ~white~, ~black~
+***** move
+A color and a vertex separated by a space.
+
+Examples: ~white h10~, ~B F5~
+***** boolean
+~true~ or ~false~
+**** Compound Type / Entities
+***** collection
+***** list
+~x*~ is a space separated list of entities of type ~x~. ~x~ can be any simple type or a collection (I think).
+
+Example: ~int* 1 2 3 4 5~
+***** alternatives
+***** multiline list
+*** Basic Commands
+**** protocol_version
+**** name
+**** version
+**** known_command
+**** list_commands
+**** quit
+**** boardsize
+Sets the board size.
+
+Example: ~boardsize 9~
+**** clear_board
+**** komi
+Sets the komi.
+
+Example: ~komi 6.5~
+**** fixed_handicap
+Sets a fixed handicap.
+
+Example: ~fixed_handicap 5~
+**** place_free_handicap
+Prompts the engine to place a number of handicap stones. Because Go engines are quite strong, it seems unlikely they would receive handicap stones.
+**** set_free_handicap
+Set a list of handicap stones.
+
+Example: ~set_free_handicap vertex* A1 A2 A3~
+**** play
+Play a move. Consecutive moves of the same color are allowed by the protocol.
+
+Example: ~play w c4~
+**** genmove
+Ask the computer to make a move for the given color.
+
+Example: ~genmove black~
+**** undo
+**** time_settings
+Set byo yomi time.
+
+Example: ~time_settings 600 30 1~
+**** time_left
+Set the time remaining for a given color.
+
+Example: ~time_left white 600 0~
+**** final_score
+Estimate final score.
+**** final_status_list
+List stones that are alive or dead. I'm not sure what all the available statuses are.
+
+Examples: ~final_status_list alive~, ~final_status_list dead~, ~final_status_list~
+**** loadsgf
