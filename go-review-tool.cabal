@@ -20,6 +20,7 @@ executable go-review-tool
                         LambdaCase
                         MultiWayIf
                         NoMonomorphismRestriction
+                        OverloadedStrings
                         PartialTypeSignatures
                         PatternGuards
                         ScopedTypeVariables
