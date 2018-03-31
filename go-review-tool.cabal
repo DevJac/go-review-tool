@@ -8,7 +8,7 @@ executable go-review-tool
   main-is:              Main.hs
   default-language:     Haskell2010
   ghc-options:          -threaded
-                        -Werror
+                        --Werror
                         -Wall
                         -Wcompat
                         -Wnoncanonical-monad-instances
