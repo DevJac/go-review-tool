@@ -91,3 +91,188 @@ List stones that are alive or dead. I'm not sure what all the available statuses
 
 Examples: ~final_status_list alive~, ~final_status_list dead~, ~final_status_list~
 **** loadsgf
+* GTK+ Overview
+** Resources
+*** Python GTK+ 3 Tutorial
+https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html
+*** GTK+ 3 Reference Manual
+https://developer.gnome.org/gtk3/stable/index.html
+** Basics
+*** Main loop and Signals
+Like most GUI toolkits, GTK+ uses an event-driven programming model. When the user is doing nothing, GTK+ sits in the main loop and waits for input. If the user performs some action - say, a mouse click - then the main loop “wakes up” and delivers an event to GTK+.
+
+When widgets receive an event, they frequently emit one or more signals. Signals notify your program that “something interesting happened” by invoking functions you’ve connected to the signal. Such functions are commonly known as callbacks. When your callbacks are invoked, you would typically take some action - for example, when an Open button is clicked you might display a file chooser dialog. After a callback finishes, GTK+ will return to the main loop and await more user input.
+
+Each widget has its own particular events which can occur.
+*** Events vs Signals
+The terms "event" and "signal" seem to be mostly interchangable.
+*** Connecting Widgets and Events
+You can connect callbacks to widget events. A handler id will be returned which can be used to disconnect the callback.
+
+When connecting a callback, you can optionally provide a value that should be passed to the callback. I'm not sure if this is applicable to the Haskell API; you could just use partial application to acheive the same thing I think?
+*** Closing Gracefully
+Applications should connect to the “destroy” signal of the top-level window. It is emitted when an object is destroyed, so when a user requests that a toplevel window is closed, the default handler for this signal destroys the window, but does not terminate the application. Connecting the “destroy” signal of the top-level window to the function Gtk.main_quit() will result in the desired behaviour.
+*** Widget Properties / State
+Widgets have "properties", which is basically a mutable state for the widget. Each widget has its own set of properties.
+*** Learning a Widget
+It seems that the best way to learn a new widget is to review both its events and properties.
+*** Unicode
+GTK+ uses UTF-8 encoding for all text.
+*** Positioning Widgets
+TLDR: Layouts in GTK+ work a lot like the DOM in browsers.
+
+While many GUI toolkits require you to precisely place widgets in a window, using absolute positioning, GTK+ uses a different approach. Rather than specifying the position and size of each widget in the window, you can arrange your widgets in rows, columns, and/or tables. The size of your window can be determined automatically, based on the sizes of the widgets it contains. And the sizes of the widgets are, in turn, determined by the amount of text they contain, or the minimum and maximum sizes that you specify, and/or how you have requested that the available space should be shared between sets of widgets. You can perfect your layout by specifying padding distance and centering values for each of your widgets. GTK+ then uses all this information to resize and reposition everything sensibly and smoothly when the user manipulates the window.
+
+GTK+ arranges widgets hierarchically, using containers. They are invisible to the end user and are inserted into a window, or placed within each other to layout components. There are two flavours of containers: single-child containers, which are all descendants of Gtk.Bin, and multiple-child containers, which are descendants of Gtk.Container. The most commonly used are vertical or horizontal boxes (Gtk.Box) and grids (Gtk.Grid).
+** Common Widgets
+*** Layout Widgets
+**** Box
+There are both horizontal and vertical boxes.
+**** Grid
+You can control what rows/columns are spanned when adding widgets to a Grid.
+**** ListBox
+Allows sorting and filtering.
+**** Stack and StackSwitcher
+Shows only one widget at a time. Can be used to animate transitions between widgets.
+**** HeaderBar
+Similar to a horizontal box. Can be used to customize the title bar rendered by the window manager in GTK+.
+**** FlowBox
+Automatically adjusts rows/columns. Can sort and filter child widgets.
+**** Notebook
+The common tab interface. For example, which tab is selected near the top of the screen will determine what "page" is displayed below.
+*** Label
+Labels are the main method of placing non-editable text in windows.
+
+- they can be multiline by using "\n"
+- the can be made selectable or not
+- they support simple formatting options and line wrapping
+- they support Pango Markup syntax
+- they support hypertext links
+- they support mnemonics; for example: press F to interact with a widget
+*** Entry
+A text entry widget.
+
+You can:
+- get/set text
+- limti text length
+- make uneditable
+- hide text; e.g. password entry forms
+- can display a progress bar behind text
+*** Buttons
+**** Button
+Can hold any widget.
+**** ToggleButton
+Note, that programmatically changing the state of a button will still cause its event handlers to be fired. This could lead to an infinite loop.
+**** CheckButton
+A check box. Same as ToggleButton, just looks different.
+**** RadioButton
+Select one from a number of options. Can use mnemonics. Can be changed after creation.
+**** LinkButton
+A hypertext link button.
+**** SpinButton
+For number entry. Has + and - buttons.
+**** switch
+A fancy toggle.
+
+You shouldn’t use the “activate” signal on the Gtk.Switch which is an action signal and emitting it causes the switch to animate. Applications should never connect to this signal, but use the “notify::active” signal, see the example here below. This is because when a property is modified, a signal is emitted, whose name is “notify::property-name”.
+*** ProgressBar
+A progress bar.
+
+- fill direction can be changed
+- can be vertical or horizontal
+- can contain text
+- can indicate percentage progress, or just general activity, depending on if the percentage completed is known
+*** Spinner
+A spinner. You can make it start spinning, and you can make it stop spinning.
+*** ComboBoxes
+**** ComboBox
+A dropdown menu.
+
+Can:
+- contain more than just text, they can contain pictures and more
+- display choices in a grid, rather than in a list
+- allow arbitrary text entry, in case none of the options in the dropdown are valid
+**** ComboBoxText
+A simplified form of ComboBox.
+*** TreeView
+TreeView -> TreeModel -> (TreeStore | ListStore)
+
+CellRenderers draw individual cells in the TreeView. They can render text or other widgets like progress bars or icons.
+
+TreeViewColumns organize the columns.
+
+You can:
+- select a row, or multiple rows, and trigger selection events
+- sort row
+- filter using the TreeModelFilter class
+**** CellRenderers
+***** CellRendererText
+Render a font with color and style. Long text will be truncated with ellipsize. Can make the text editable.
+***** CellRendererToggle
+Renderes a toggle button in a cell.
+***** CellRendererPixbuf
+Render an icon.
+***** CellRendererCombo
+Renders a dropdown combo box in a cell.
+***** CellRendererProgress
+Renders a progress bar in a cell.
+***** CellRendererSpin
+Render a number entry form with + and - buttons (a spinner).
+*** IconView
+Displays icons in a grid.
+
+Supports:
+- drag and drop
+- single and multiple selection
+- item ordering
+
+The IconView is backed by a ListStore.
+*** TextView
+Can display a large amount of text.
+
+Has a model/view design, and is backed by the TextBuffer.
+
+Text can be:
+- justified: left, right, center, etc
+- word wrapped or not
+- have a visible cursor or not
+- be editable or not
+
+TextMarks are used to store positions in the text. TextMarks can be made visible, but are not visible by default.
+
+TextIter can be used to search for text using TextIter.forward_search() and TextIter.backward_search().
+
+TextTags can be used to mark text as bold, to mark certain text as uneditable, or countless other things.
+*** Dialogs
+**** Dialog
+Dialog.get_content_area() returns a Box. Add content to that box, then call Box.add_button() as needed to add buttons to the bottom of the dialog.
+
+A Dialog can be "modal" or not. A modal dialog prevents the user from interacting with the rest of the application until the dialog is dismissed.
+
+Code can call Dialog.run() to block and get a return value in the usual way. Or you can use the "response" event.
+
+Dialogs can be hidden instead of destroyed. This way you can avoid creating the same dialog over and over, thus improving efficiency.
+**** MessageDialog
+Used for simple messages.
+
+If secondary text is added, the primary text will be larger and bold, and the secondary text will be smaller.
+**** FileChooserDialog
+Used for File/Open of File/Save dialogs.
+
+There is also a FileChooser widget which is related.
+
+Typical uses:
+- open a file
+- save a file for the first time
+- save a file under a new name; e.g. a "Save As" dialog
+- to choose a folder
+- select a single, or multiple files
+
+Options:
+- show hidden files, or not
+- confirm overwrite of existing file, or not
+- filter files
+*** Popover
+You can place arbitrary widgets inside a Popover to make custom Popovers.
+
+You can create a Popover from a MenuModel.
