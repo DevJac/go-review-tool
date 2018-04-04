@@ -97,6 +97,10 @@ Examples: ~final_status_list alive~, ~final_status_list dead~, ~final_status_lis
 https://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html
 *** GTK+ 3 Reference Manual
 https://developer.gnome.org/gtk3/stable/index.html
+*** Cairo Tutorial for Python Programmers
+http://www.tortall.net/mu/wiki/CairoTutorial
+
+Or adapted for to C: https://cairographics.org/tutorial/
 ** Basics
 *** Main loop and Signals
 Like most GUI toolkits, GTK+ uses an event-driven programming model. When the user is doing nothing, GTK+ sits in the main loop and waits for input. If the user performs some action - say, a mouse click - then the main loop “wakes up” and delivers an event to GTK+.
@@ -276,3 +280,43 @@ Options:
 You can place arbitrary widgets inside a Popover to make custom Popovers.
 
 You can create a Popover from a MenuModel.
+** Cairo
+*** Nouns
+**** Destination
+The surface on which you're drawing. This surface collects the elements of your graphic as you apply them, allowing you to build up a complex work as though painting on a canvas.
+
+This may be a widget or a SVG or PDF file.
+**** Source
+The "paint" you're about to work with. It may be a color, or a pattern with translucency, etc.
+
+There are three main kinds of sources in cairo: colors, gradients, and images.
+**** Mask
+Controls where the source is applied to the destination.
+**** Path
+Closely related to both the mask and the context (verbs).
+
+Cairo always has an active path.
+
+The path may be cleared after callling stroke or fill, depending on which variant/options you use.
+
+Paths may be defined using:
+- straight lines
+- arcs
+- curves (cubic Bezier splines)
+*** Verbs
+**** Stroke
+Like a brush stroke. Copies the source onto the destination along a path.
+**** Fill
+Fills the area inside a path. Complex paths are influenced by a fill rule.
+**** Show Text / Glyphs
+Creates a path based on a font and some text, then fills the path to render the text.
+**** Paint
+Paints the entire source to the destination. The mask can be thought of as infinitely large; the mask has no effect on this operation.
+**** Mask
+Sets the mask using a second source (which might be the same as the first source). This can be used for drawing a source while respecting transparency in the source.
+*** Context
+A complete drawing instuction; e.g. "draw source X with mask Y to destination Z."
+*** Transformations
+A transformation is a mapping between the programs virtual coordinates and the physical coordinates of the display device (or image coordinates, etc.). Usually, the two coordinate systems are identical (that is, there is an identity map between them), but a complex mapping can be created between them.
+
+It is possible to perform different context operations with different transformations; e.g. draw a path under a transformation and then stroke the path without a transformation.
