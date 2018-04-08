@@ -27,3 +27,6 @@ executable go-review-tool
                         ViewPatterns
   build-depends:        base
                       , gi-gtk
+                      , gi-cairo
+                      , cairo
+                      , transformers
