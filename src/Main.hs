@@ -4,7 +4,8 @@ import qualified GI.Gtk as Gtk
 import GI.Gtk hiding (main)
 import GI.Gtk.Enums (WindowType(..))
 import qualified GI.Cairo
-import Graphics.Rendering.Cairo
+import Graphics.Rendering.Cairo hiding (x, y)
+import qualified Graphics.Rendering.Cairo as Cairo
 import Graphics.Rendering.Cairo.Internal (Render(runRender))
 import Graphics.Rendering.Cairo.Types (Cairo(Cairo))
 
@@ -23,11 +24,8 @@ main = do
 
     boardDrawingArea <- drawingAreaNew
     _ <- onWidgetDraw boardDrawingArea $ \context -> do
-        renderWithContext context $ do
-            setSourceRGB 0 2000 0
-            paint
+        renderWithContext context drawBoard
         return True
-
 
     setContainerChild window boardDrawingArea
     widgetShowAll window
@@ -38,3 +36,22 @@ renderWithContext :: GI.Cairo.Context -> Render () -> IO ()
 renderWithContext context r =
     withManagedPtr context $ \p ->
     runReaderT (runRender r) (Cairo (castPtr p))
+
+drawBoard :: Render ()
+drawBoard = do
+    translate 100 100
+    scale 0.4 0.4
+    setSourceRGB 0.8 0.65 0.32
+    paint
+    setSourceRGB 0.2 0.2 0.2
+    mapM_ (\(a, b, c, d) -> line a b c d) [(x, 0, x, 1800) | x <- [0, 100 .. 1800]]
+    mapM_ (\(a, b, c, d) -> line a b c d) [(0, y, 1800, y) | y <- [0, 100 .. 1800]]
+
+line :: Double -> Double -> Double -> Double -> Render ()
+line startX startY endX endY = do
+    moveTo startX startY
+    lineTo endX endY
+    setLineWidth 3
+    setLineJoin LineJoinRound
+    setLineCap LineCapRound
+    stroke
