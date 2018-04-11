@@ -9,6 +9,9 @@ import qualified Graphics.Rendering.Cairo as Cairo
 import Graphics.Rendering.Cairo.Internal (Render(runRender))
 import Graphics.Rendering.Cairo.Types (Cairo(Cairo))
 
+data PlayerColor = Black | White deriving (Show, Eq)
+
+main :: IO ()
 main = do
     _ <- Gtk.init Nothing
 
@@ -46,6 +49,19 @@ drawBoard = do
     setSourceRGB 0.2 0.2 0.2
     mapM_ (\(a, b, c, d) -> line a b c d) [(x, 0, x, 1800) | x <- [0, 100 .. 1800]]
     mapM_ (\(a, b, c, d) -> line a b c d) [(0, y, 1800, y) | y <- [0, 100 .. 1800]]
+    drawStone Black 300 300
+    drawStone White 300 400
+
+drawStone :: PlayerColor -> Double -> Double -> Render ()
+drawStone color x y = do
+    arc x y 47 0 (1.999999 * pi)
+    closePath
+    setPlayerColor color
+    fill
+
+setPlayerColor :: PlayerColor -> Render ()
+setPlayerColor Black = setSourceRGB 0 0 0
+setPlayerColor White = setSourceRGB 1 1 1
 
 line :: Double -> Double -> Double -> Double -> Render ()
 line startX startY endX endY = do
