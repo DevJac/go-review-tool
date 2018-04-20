@@ -30,7 +30,10 @@ main = do
         renderWithContext context drawBoard
         return True
 
-    setContainerChild window boardDrawingArea
+    boardAspectFrame <- aspectFrameNew Nothing 0.5 0.5 1 False
+    setContainerChild boardAspectFrame boardDrawingArea
+
+    setContainerChild window boardAspectFrame
     widgetShowAll window
 
     Gtk.main
