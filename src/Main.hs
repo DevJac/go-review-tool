@@ -4,7 +4,7 @@ import qualified GI.Gtk as Gtk
 import GI.Gtk hiding (main)
 import GI.Gtk.Enums (WindowType(..))
 import qualified GI.Cairo
-import Graphics.Rendering.Cairo hiding (x, y)
+import Graphics.Rendering.Cairo hiding (x, y, width, height)
 import qualified Graphics.Rendering.Cairo as Cairo
 import Graphics.Rendering.Cairo.Internal (Render(runRender))
 import Graphics.Rendering.Cairo.Types (Cairo(Cairo))
@@ -27,7 +27,7 @@ main = do
 
     boardDrawingArea <- drawingAreaNew
     _ <- onWidgetDraw boardDrawingArea $ \context -> do
-        renderWithContext context drawBoard
+        renderWithContext context (drawBoard boardDrawingArea)
         return True
 
     boardAspectFrame <- aspectFrameNew Nothing 0.5 0.5 1 False
@@ -43,10 +43,13 @@ renderWithContext context r =
     withManagedPtr context $ \p ->
     runReaderT (runRender r) (Cairo (castPtr p))
 
-drawBoard :: Render ()
-drawBoard = do
-    translate 100 100
-    scale 0.4 0.4
+drawBoard :: DrawingArea -> Render ()
+drawBoard boardDrawingArea = do
+    width <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth boardDrawingArea
+    height <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight boardDrawingArea
+    -- 1910 = 1800 (Goban grid) + 2 * 55 (Goban margin)
+    scale (width / 1910) (height / 1910)
+    translate 55 55
     setSourceRGB 0.8 0.65 0.32
     paint
     setSourceRGB 0.2 0.2 0.2
