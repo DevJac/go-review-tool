@@ -27,7 +27,7 @@ main = do
 
     boardDrawingArea <- drawingAreaNew
     _ <- onWidgetDraw boardDrawingArea $ \context -> do
-        renderWithContext context (drawBoard boardDrawingArea)
+        renderWithContext context (drawBoard 9 boardDrawingArea)
         return True
 
     boardAspectFrame <- aspectFrameNew Nothing 0.5 0.5 1 False
@@ -43,18 +43,20 @@ renderWithContext context r =
     withManagedPtr context $ \p ->
     runReaderT (runRender r) (Cairo (castPtr p))
 
-drawBoard :: DrawingArea -> Render ()
-drawBoard boardDrawingArea = do
+drawBoard :: Int -> DrawingArea -> Render ()
+drawBoard size boardDrawingArea = do
+    --  lrc = lower-right coordinate
+    let lrc = (fromIntegral size - 1) * 100
+        boardMargin = 55
     width <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth boardDrawingArea
     height <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight boardDrawingArea
-    -- 1910 = 1800 (Goban grid) + 2 * 55 (Goban margin)
-    scale (width / 1910) (height / 1910)
-    translate 55 55
+    scale (width / (lrc + (2 * boardMargin))) (height / (lrc + (2 * boardMargin)))
+    translate boardMargin boardMargin
     setSourceRGB 0.8 0.65 0.32
     paint
     setSourceRGB 0.2 0.2 0.2
-    mapM_ (\(a, b, c, d) -> line a b c d) [(x, 0, x, 1800) | x <- [0, 100 .. 1800]]
-    mapM_ (\(a, b, c, d) -> line a b c d) [(0, y, 1800, y) | y <- [0, 100 .. 1800]]
+    mapM_ (\(a, b, c, d) -> line a b c d) [(x, 0, x, lrc) | x <- [0, 100 .. lrc]]
+    mapM_ (\(a, b, c, d) -> line a b c d) [(0, y, lrc, y) | y <- [0, 100 .. lrc]]
     drawStone Black 300 300
     drawStone White 300 400
 
