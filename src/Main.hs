@@ -44,6 +44,12 @@ renderWithContext context r =
     withManagedPtr context $ \p ->
     runReaderT (runRender r) (Cairo (castPtr p))
 
+starPoints :: Int -> [(Double, Double)]
+starPoints 9 = (400, 400) : [(x, y) | x <- [200, 600], y <- [200, 600]]
+starPoints 13 = (600, 600) : [(x, y) | x <- [300, 900], y <- [300, 900]]
+starPoints 19 =  [(x, y) | x <- [300, 900, 1500], y <- [300, 900, 1500]]
+starPoints _ =  []
+
 drawBoard :: Int -> DrawingArea -> Render ()
 drawBoard size boardDrawingArea = do
     --  lrc = lower-right coordinate
@@ -58,15 +64,17 @@ drawBoard size boardDrawingArea = do
     setSourceRGB 0.2 0.2 0.2
     mapM_ (\(a, b, c, d) -> line a b c d) [(x, 0, x, lrc) | x <- [0, 100 .. lrc]]
     mapM_ (\(a, b, c, d) -> line a b c d) [(0, y, lrc, y) | y <- [0, 100 .. lrc]]
-    drawStone Black 300 300
-    drawStone White 300 400
+    mapM_ (\(x, y) -> drawCircle x y 12) (starPoints size)
+    drawStone Black 3 3
+    drawStone White 3 4
 
-drawStone :: PlayerColor -> Double -> Double -> Render ()
+drawStone :: PlayerColor -> Int -> Int -> Render ()
 drawStone color x y = do
-    arc x y 47 0 (1.999999 * pi)
-    closePath
     setPlayerColor color
-    fill
+    drawCircle (fromIntegral x * 100) (fromIntegral y * 100) 47
+
+drawCircle :: Double -> Double -> Double -> Render ()
+drawCircle x y r = arc x y r 0 (1.999999 * pi) >> closePath >> fill
 
 setPlayerColor :: PlayerColor -> Render ()
 setPlayerColor Black = setSourceRGB 0 0 0
