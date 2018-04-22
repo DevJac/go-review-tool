@@ -26,6 +26,7 @@ main = do
     --     putStrLn "Hello World"
 
     boardDrawingArea <- drawingAreaNew
+    widgetSetSizeRequest boardDrawingArea 400 400
     _ <- onWidgetDraw boardDrawingArea $ \context -> do
         renderWithContext context (drawBoard 9 boardDrawingArea)
         return True
