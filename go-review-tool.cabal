@@ -24,6 +24,7 @@ executable go-review-tool
                         PartialTypeSignatures
                         PatternGuards
                         ScopedTypeVariables
+                        TypeApplications
                         ViewPatterns
   build-depends:        base
                       , gi-gtk
