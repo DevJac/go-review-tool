@@ -1,3 +1,4 @@
+module Main where
 import Control.Monad.Trans.Reader (runReaderT)
 import Foreign.Ptr (castPtr)
 import qualified GI.Gtk as Gtk
@@ -8,8 +9,7 @@ import Graphics.Rendering.Cairo hiding (x, y, width, height)
 import qualified Graphics.Rendering.Cairo as Cairo
 import Graphics.Rendering.Cairo.Internal (Render(runRender))
 import Graphics.Rendering.Cairo.Types (Cairo(Cairo))
-
-data PlayerColor = Black | White deriving (Show, Eq)
+import Board (PlayerColor(Black, White))
 
 main :: IO ()
 main = do

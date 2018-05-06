@@ -31,3 +31,5 @@ executable go-review-tool
                       , gi-cairo
                       , cairo
                       , transformers
+                      , vector
+  other-modules:        Board
