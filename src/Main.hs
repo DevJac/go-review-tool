@@ -6,7 +6,6 @@ import GI.Gtk hiding (main)
 import GI.Gtk.Enums (WindowType(..))
 import qualified GI.Cairo
 import Graphics.Rendering.Cairo hiding (x, y, width, height)
-import qualified Graphics.Rendering.Cairo as Cairo
 import Graphics.Rendering.Cairo.Internal (Render(runRender))
 import Graphics.Rendering.Cairo.Types (Cairo(Cairo))
 import Board (PlayerColor(Black, White))
@@ -19,11 +18,6 @@ main = do
     _ <- onWidgetDestroy window mainQuit
     setContainerBorderWidth window 10
     setWindowTitle window "Hello World"
-
-    -- button <- buttonNew
-    -- setButtonLabel button "Hello World"
-    -- _ <- onButtonClicked button $
-    --     putStrLn "Hello World"
 
     boardDrawingArea <- drawingAreaNew
     widgetSetSizeRequest boardDrawingArea 400 400
