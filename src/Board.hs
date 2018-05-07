@@ -1,4 +1,11 @@
-module Board where
+module Board (
+    Board
+  , PlayerColor(Black, White)
+  , newBoard
+  , update
+  , get
+  , boardSize
+) where
 import Data.Maybe (fromMaybe)
 import qualified Data.Vector as V
 
@@ -19,3 +26,6 @@ update x y color b@(Board size v)
 
 get :: Int -> Int -> Board -> Maybe PlayerColor
 get x y (Board size v) = fromMaybe Nothing $ v V.!? (x * size + y)
+
+boardSize :: Board -> Int
+boardSize (Board size _) = size

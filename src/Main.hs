@@ -2,13 +2,13 @@ module Main where
 import Control.Monad.Trans.Reader (runReaderT)
 import Foreign.Ptr (castPtr)
 import qualified GI.Gtk as Gtk
-import GI.Gtk hiding (main)
+import GI.Gtk hiding (main, get)
 import GI.Gtk.Enums (WindowType(..))
 import qualified GI.Cairo
 import Graphics.Rendering.Cairo hiding (x, y, width, height)
 import Graphics.Rendering.Cairo.Internal (Render(runRender))
 import Graphics.Rendering.Cairo.Types (Cairo(Cairo))
-import Board (PlayerColor(Black, White))
+import Board
 
 main :: IO ()
 main = do
@@ -22,7 +22,10 @@ main = do
     boardDrawingArea <- drawingAreaNew
     widgetSetSizeRequest boardDrawingArea 400 400
     _ <- onWidgetDraw boardDrawingArea $ \context -> do
-        renderWithContext context (drawBoard 9 boardDrawingArea)
+        let board0 = newBoard 19
+            board1 = update 0 0 (Just Black) board0
+            board2 = update 1 1 (Just White) board1
+        renderWithContext context (drawBoard board2 boardDrawingArea)
         return True
 
     boardAspectFrame <- aspectFrameNew Nothing 0.5 0.5 1 False
@@ -44,10 +47,11 @@ starPoints 13 = (600, 600) : [(x, y) | x <- [300, 900], y <- [300, 900]]
 starPoints 19 =  [(x, y) | x <- [300, 900, 1500], y <- [300, 900, 1500]]
 starPoints _ =  []
 
-drawBoard :: Int -> DrawingArea -> Render ()
-drawBoard size boardDrawingArea = do
+drawBoard :: Board -> DrawingArea -> Render ()
+drawBoard board boardDrawingArea = do
+    let size = boardSize board
     --  lrc = lower-right coordinate
-    let lrc = (fromIntegral size - 1) * 100
+        lrc = (fromIntegral size - 1) * 100
         boardMargin = 55
     width <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth boardDrawingArea
     height <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight boardDrawingArea
@@ -59,8 +63,9 @@ drawBoard size boardDrawingArea = do
     mapM_ (\(a, b, c, d) -> line a b c d) [(x, 0, x, lrc) | x <- [0, 100 .. lrc]]
     mapM_ (\(a, b, c, d) -> line a b c d) [(0, y, lrc, y) | y <- [0, 100 .. lrc]]
     mapM_ (\(x, y) -> drawCircle x y 12) (starPoints size)
-    drawStone Black 3 3
-    drawStone White 3 4
+    mapM_ (\(x, y) -> maybe (pure ()) (\c -> drawStone c x y) (get x y board))
+          [(x, y) | x <- [0..lrc], y <- [0..lrc]]
+
 
 drawStone :: PlayerColor -> Int -> Int -> Render ()
 drawStone color x y = do
