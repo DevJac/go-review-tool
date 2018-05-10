@@ -8,10 +8,19 @@ import qualified GI.Cairo
 import Graphics.Rendering.Cairo hiding (x, y, width, height)
 import Graphics.Rendering.Cairo.Internal (Render(runRender))
 import Graphics.Rendering.Cairo.Types (Cairo(Cairo))
+import System.Process.Typed
 import Board
 
 main :: IO ()
 main = do
+    let leelaProcess = setStdin createPipe
+                     $ setStdout createPipe
+                     $ setStderr createPipe
+                       "leela_gtp"
+    withProcess_ leelaProcess $ const gtkSetup
+
+gtkSetup :: IO ()
+gtkSetup = do
     _ <- Gtk.init Nothing
 
     window <- windowNew WindowTypeToplevel

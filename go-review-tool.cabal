@@ -32,4 +32,5 @@ executable go-review-tool
                       , cairo
                       , transformers
                       , vector
+                      , typed-process
   other-modules:        Board
